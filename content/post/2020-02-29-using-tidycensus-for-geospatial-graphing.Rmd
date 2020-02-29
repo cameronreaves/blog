@@ -1,0 +1,67 @@
+---
+title: Using Tidycensus for Geospatial Graphing
+author: ''
+date: '2020-02-29'
+slug: using-tidycensus-for-geospatial-graphing
+categories: []
+tags: []
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(tidycensus)
+library(gt)
+census_api_key("8318bba2a3747376ec975229cca54890c295e454")
+
+```
+
+To use tidycensus for geospatial graphing, you will need a census api key. I'm not sure what limitations there are but it was pretty easy for me to get one. Just go to this link and fill out the form  http://api.census.gov/data/key_signup.html, though it may take a bit of time for you to recieve the key by email. For some reason, there is high variance; at least, among my classmates. 
+
+Well, once you get that in order. It is super easy to get going!
+
+For this graph, I will use the get_acs() function which will return data from the American Communities Survey, which is not a true census, but a sample of the United States demographics that can be quite accurate. 
+
+We are going to get median income by county in the year 2018 and limit our results to Georgia, the Peach State. On the documentation for tidycensus you can find all of the variables--they all seemed to be impossible to understand or interpret, but I'm sure there is a pattern. Make sure that the argument, geometries,  is set to TRUE. 
+
+```{r include=FALSE}
+GA = get_acs(geography = "county",variables = c(medincome = "B19013_001"),
+      year = 2018, state = "GA", geometry = TRUE)
+
+```
+
+
+```{r eval=FALSE, tidy=TRUE}
+GA = get_acs(geography = "county",variables = c(medincome = "B19013_001"),
+      year = 2018, state = "GA", geometry = TRUE)
+
+```
+
+
+There is now a sf (simple features) dataframe stored in the variable "GA". I am excluding the geometry column just for aesthetics. 
+
+```{r echo=FALSE}
+GA %>%
+  head(5) %>% 
+  gt() %>% 
+  cols_hide(
+    columns = vars(geometry)
+  )
+```
+
+
+
+Let's Graph! Hopefully, you are familar with the ggplot2 package. 
+Boom Badda Pang Pow. Welcome to Georgia!
+
+```{r}
+GA %>%
+  ggplot(aes(fill = estimate)) +
+  geom_sf() + 
+  scale_fill_viridis_c(option = "plasma",
+                       direction = -1,breaks = c(40000, 60000, 80000, 100000), labels=c("40,000", "60,000", "80,000", "100,000")) +
+  labs(title = "Median Income by County in California",
+       caption = "Source: American Communities Survey 2018",
+       fill = "Median Income") +
+  theme_void()
+```
+

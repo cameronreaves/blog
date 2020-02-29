@@ -1,0 +1,87 @@
+---
+title: Map Functions (Purrr) and Letters  (GOV PS)
+author: ''
+date: '2020-02-29'
+slug: map-functions-purrr-and-letters
+categories: []
+tags: []
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(gt)
+```
+
+
+
+For my problem set in Gov 1005, I learned how to interate over a tibble (table dataframe) using map functions from purrr. Ordinarily, I would have used a for loop or even worked with lists, but this opened my eyes to how succinct and useful map_* functions are!
+
+The first thing I did was create a few function that I would reference later. 
+
+The first function get_letters() takes an argument "a" that samples "a" letters from the alphabet and then using the base min() function to return the smallest letter (closest to A, farthest from Z). I didn't know this but there is a built-in vector "letters" in r that has all 26 letters already preassigned inside of it. Really helpful! 
+
+The second function roll_alpha_dice() takes two arguments. It calls get_letters() "n" times, passing through the number of letters you initially want to sample "a". This uses the map_chr() function that returns a character vector storing n letters. 
+
+```{r}
+
+
+get_letters = function(a = 3){
+  min(sample(letters, a))
+}
+
+roll_alpha_dice = function(n, a = 3){
+  map_chr(1:n, ~get_letters(a))
+}
+
+```
+
+
+
+Next up, I am going to use these functions to simulate a game. Let's say that there are four players (A,B,C,D). For each player, I will get 100 hundred letters and store them in a tibble. In this same tibble declaration, I can use another map function, map_lgl(), to iterate over the entire length of A's column and assign a logical (TRUE or FALSE) to a column called "vowel" if, unsurprisingly, that letter is a vowel. As always, we can use %in% to check to see if . (a row in the column A) is a in the string vector l.   
+```{r}
+n = 100
+l = c("a","e","i","o","u")
+x <- tibble(A=roll_alpha_dice(n), B=roll_alpha_dice(n), 
+  C = roll_alpha_dice(n), D = roll_alpha_dice(n), vowel = map_lgl(A, ~. %in% l))
+
+x %>% 
+  head(5) %>% 
+  gt()
+
+```
+
+```{r include=FALSE}
+s = sum(x$vowel)
+
+```
+
+
+Turns out that there were `r s` vowels A's column.  
+
+
+
+The coolest part is coming up. Now, I will make a bigger tibble of length 10,000. The same players are playing.
+Okay, so what if I wanted to iterate over the entire dataframe and check how many times every single player got a vowel on the same roll? Can I do that? Of course I can! Using map!
+
+
+So, the map_lgl() iterates over the length of the dataframe, a vector containing each row is returned--the "." is the index of the row. The base function all() checks if all letters in the vector are in l (is a vowel), and then I turn the result into a table that counts the true and false instances. 
+
+```{r}
+
+#I didn't need to name the columns but just for visual
+
+n = 10000
+x <- tibble(A=roll_alpha_dice(n),B=roll_alpha_dice(n),
+    C = roll_alpha_dice(n), D = roll_alpha_dice(n))
+
+y = prop.table(table(
+  map_lgl(1:n, ~all(x[., ]  %in% l ))))[2]
+
+```
+
+
+Using this process, I simulated that the probability that they all roll a vowel is `r y * 100` %. 
+
+Wicked right! 
+
+I feel like this usually when a programmer breaks out her for loops, but nope, she doesn't even need them.
