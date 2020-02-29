@@ -1,0 +1,19 @@
+---
+title: testing
+author: ''
+date: '2020-02-29'
+slug: testing
+categories: []
+tags: []
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+ggplot(mtcars, aes(disp, hp))+
+  geom_point()
+```
+
