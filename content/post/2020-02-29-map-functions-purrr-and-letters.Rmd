@@ -1,5 +1,5 @@
 ---
-title: Map Functions (Purrr) and Letters  (GOV PS)
+title: Map Functions (Purrr) and Letters
 author: ''
 date: '2020-02-29'
 slug: map-functions-purrr-and-letters
