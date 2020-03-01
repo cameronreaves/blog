@@ -1,0 +1,11 @@
+---
+title: CS50 Final Project [PHP/HTML]
+author: ''
+date: '2017-11-29'
+slug: cs50-final-project
+---
+
+
+```{r echo=FALSE}
+knitr::include_url("https://www.youtube.com/embed/EPuhYvSuqvk")
+```

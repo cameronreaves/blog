@@ -1,10 +1,10 @@
 ---
-title: Vacations
+title: Vacations [R]
 author: ''
-date: '2020-02-29'
+date: '2020-01-02'
+categories:
+  - R
 slug: vacations
-categories: []
-tags: []
 ---
 
 ## Introduction
@@ -78,6 +78,7 @@ For regions, Europe, Africa, and Asia, I repeat this process, scraping data on m
 
 ## Manipulating Cities Data 
 I now had nine dataframes: one per region per metric. And I wanted to combine them all together so I would have one dataframe. Using a left_join one at a time, I merged the pollution and crime dataframes into the dataframe containing the cost of living dataframe. To avoid double counting the column region, I passed into the select method -c(region). 
+
 ```{r include=FALSE}
 africa_vac <- readRDS("vacations/africa_vac.rds")
 africa_vac_crime <- readRDS("vacations/africa_vac_crime.rds")

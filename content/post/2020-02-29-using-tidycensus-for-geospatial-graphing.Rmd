@@ -1,5 +1,5 @@
 ---
-title: Using Tidycensus for Geospatial Graphing
+title: Using Tidycensus for Geospatial Graphing [R]
 author: ''
 date: '2020-02-29'
 slug: using-tidycensus-for-geospatial-graphing
@@ -30,7 +30,7 @@ GA = get_acs(geography = "county",variables = c(medincome = "B19013_001"),
 ```
 
 
-```{r eval=FALSE, tidy=TRUE}
+```{r eval=FALSE}
 GA = get_acs(geography = "county",variables = c(medincome = "B19013_001"),
       year = 2018, state = "GA", geometry = TRUE)
 

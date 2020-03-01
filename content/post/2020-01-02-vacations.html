@@ -1,10 +1,10 @@
 ---
 title: Vacations [R]
 author: ''
-date: '2020-02-29'
+date: '2020-01-02'
+categories:
+  - R
 slug: vacations
-categories: []
-tags: []
 ---
 
 
@@ -79,10 +79,10 @@ as_tibble(vacation_data[ind,])</code></pre>
 <pre><code>## # A tibble: 4 x 12
 ##   name  cost_of_living  rent col_plus_rent grocery  rest pow_pur_ind region
 ##   &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt; 
-## 1 Napl…           60.7 19.0           40.7    51.7  55.0        63.6 Europe
-## 2 Sara…           39.6  9.71          25.3    30.9  28.1        43.6 Europe
-## 3 Patr…           52.6  8.72          31.6    38.3  47.1        49.3 Europe
-## 4 Jaka…           42.0 17.0           30.0    42.2  23.4        28.1 Asia  
+## 1 Bras…           36.9  10.3          24.2    30.3  31.7        57.0 Europe
+## 2 The …           76.8  35.4          57.0    59.2  83.9        95.1 Europe
+## 3 Turi…           68.7  20.6          45.7    56.6  72.8        74.2 Europe
+## 4 Tbil…           27.9  10.0          19.4    21.5  27.1        31.1 Asia  
 ## # … with 4 more variables: poll_ind &lt;dbl&gt;, poll_exp &lt;dbl&gt;, crime &lt;dbl&gt;,
 ## #   safety &lt;dbl&gt;</code></pre>
 <p>There are currently over 200 something cities in the complete data frame, many of which, my partner nor I have ever heard of. It felt odd rating a city that we knew nothing about. I anticipated that we would rate it very low (what could we be excited about?) or just rate it based on the country that it is in. This would, I hypothesized, skew up our preference towards cities that are more well known and deflate the ratings of unknown cities. Besides that, it would also take us long time to rate properly–going down a list of cities one at a time. To fix this problem, I split the name column into two columns: city and country using a tidyr method called seperate(). Now a factor, there are only 84 levels for the country variable, much more managable to rate.</p>
@@ -124,18 +124,18 @@ vacation_data &lt;- left_join(vacation_data, vacation_pref, by= &quot;country&qu
 <h2>Data Visualization</h2>
 <p>Whew, that was a lot of work! But now comes the cool part. Visualizing and understanding what the data means for my partner and I. And finally answering the question that we have been waiting for…where do we go from here?</p>
 <p>Well, the easiest question to start with is how did our preferences vary. From the two bar charts, produced using ggplot2’s geom_bar(), it seems that the data provides evidence to support my initial hypothesis that Naomi wants to travel to Africa the most. Namely, it apepars that Naomi, on average, ranked countries in Africa the highest. But what is also interesting is that there seems to be evidence that I am much more impartial when ranking countries between regions. In other words, although the region Asia had the highest average preference score, that does guruantee that a significant difference in preference between the other regions exists. On average, the error bars (+/- one standard deviation) for that region include the means of other regions.
-<img src="/post/2020-02-29-vacations_files/figure-html/unnamed-chunk-11-1.png" width="672" /><img src="/post/2020-02-29-vacations_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<img src="/post/2020-01-02-vacations_files/figure-html/unnamed-chunk-11-1.png" width="672" /><img src="/post/2020-01-02-vacations_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
 <p>Next, I wanted to look at another bar chart that shows the combined mean preference score grouped by region. “Tsamina mina eh eh, Waka waka eh ehhe!” The region Africa has the highest combined mean preference score for the countries ranked from that region, which indicates that we should priorize region Africa when planning our future trips. I will note however that the upped end of the error bar for the region Asia extends just a bit beyond the error bar for Africa, suggesting that preference for Asia could potentially be above Africa. Nevertheless, we will work with the Africa region for the next part.</p>
-<p><img src="/post/2020-02-29-vacations_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="/post/2020-01-02-vacations_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Now that we have a region. Where in that region is the best place to go? Well, I decided to make a graph that is definitely pushing up against the limits of TMI (too much information), but I wanted to showcase my skills! We have safety on the x axis and cost of living on the y axis. Obviously, the higher up on the safety index a city is, the more safe it is. That is quite intuitive for the viewer (you); however, for the cost of living index, I wanted make sure that that metric is displayed accurately. The higher up on the cost of living index, the more expensive the city, so I reversed the axis so that the upper right hand corner is where the most desirable cities will be. Dashed lines drawing the quandrants are supposed help the viewer see this trend. Next, the metrics, combined preference and pollution index, are displayed by color and size, respectively. The lighter the coordinate point, the higher the combinded preference for that city; the larger the size of that point, the more polluted that city.</p>
 <p>From this data, it appears that cities in North Africa (Tunis, Algiers, Cairo, Alexandra, Casablanca) have the lowest cost of living and arer the highest on the safety index in the region Africa, pollution being relatively similar between cities. Which cities do we prefer the most? Cairo and Alexandra (Egypt) have much lighter colors than the others, and so, appear to be the prefered destination for the both of us. It looks like we are headed to the Pyramids!</p>
-<p><img src="/post/2020-02-29-vacations_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="/post/2020-01-02-vacations_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
 <p>A lot this worked out better than I thought that it would. Still, I’m sure that there are things that I could have done better or more efficiently. One issue is that Numbeo, where I got the city data, didn’t have as much data on Africa and Asia as it did Europe (just check out that graph).
-<img src="/post/2020-02-29-vacations_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<img src="/post/2020-01-02-vacations_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p>So that is a bit of a bummer. Another issue is that the preference/ranking could have been more scientific. I went down the list of an excel spreadsheet calling out country names to a tired Naomi, who seemed to only rank cities with a 1 or a 7 (see below).
-<img src="/post/2020-02-29-vacations_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<img src="/post/2020-01-02-vacations_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p>Besides that I am quite happy. This is literally all my work, and I am proud of what I made. I feel like Naruto after he finally mastered the rasengan.</p>
 </div>

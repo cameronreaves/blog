@@ -1,0 +1,40 @@
+---
+title: Sustainability Word Cloud with Tidytext [R]
+author: ''
+date: '2020-02-29'
+slug: sustainability-word-cloud-with-tidytext
+categories: []
+tags: []
+---
+
+
+
+<p>For the past year, I have worked at Harvard’s Office for Sustainability as an Undergraduate Sustainability REP. The other day, my team hosted a fun event called “Cookies for Questions”. Freshmen students were invited to text in a question about sustainability at Harvard. In return, one of us REPs would hand deliver them a piping hot cookie fresh out of the oven, and give them an answer to their question.</p>
+<p>All in all, the event was a success. Over 130 students texted us a question and the REPs enjoyed engaging with the students. Luckily, we used an excel spreadsheet to record the information for each delivery: where they were located, what question they asked, and obviously what type of cookie they wanted delivered.</p>
+<p>Using a cleaned dataset (minus all identifiable data), I will do some data analysis and create a sustainabilty wordcloud, that will hopefully provide us some useful insights.</p>
+<p>To clean the initial data, I used the packages readxl and janitor. The function janitor::clean_names() is so so so useful.</p>
+<p>First up is cookies. The most popular cookie by far was chocolate chip, and there were very few orders of vegan or gluten free.</p>
+<p><img src="/post/2020-02-29-sustainability-word-cloud-with-tidytext_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Next, I looked at dorms. Even Lamont Library and Pierce (the engineering building) managed to get a few cookies delivered to them.</p>
+<p><img src="/post/2020-02-29-sustainability-word-cloud-with-tidytext_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Finally, I created the word cloud. First, I call the unnest_tokens function from the tidytext package, this takes each word of each question and puts that word in its own row. Then, I complete an anti join with a data set of “stop words” (words like a, the, and, etc..) that are just noise for our purposes. After that use map_chr() and SemNetCleaner:: singularize to convert each word to its singular form. If I didn’t do that cup and cups would be counted separately.</p>
+<p>Then, grouping and couting each word, I call wordcloud() to display the top 50 most used words submitted in questions for cookies. I could have removed Harvard from the list, but it made sense to keep it in!</p>
+<pre class="r"><code>data(stop_words)
+
+tidy_questions = questions %&gt;% 
+  select(question) %&gt;% 
+  unnest_tokens(word, question) 
+
+tidy_questions = tidy_questions %&gt;% 
+  anti_join(stop_words, by = &quot;word&quot;)
+
+tidy_questions$word = map_chr(tidy_questions$word, ~ singularize(.))
+
+pal &lt;- brewer.pal(8,&quot;Dark2&quot;)
+
+# plot the 50 most common words
+tidy_questions %&gt;% 
+  count(word) %&gt;% 
+  arrange(desc(n)) %&gt;% 
+  with(wordcloud(word, n, random.order = FALSE, max.words = 50, colors=pal))</code></pre>
+<p><img src="/post/2020-02-29-sustainability-word-cloud-with-tidytext_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>

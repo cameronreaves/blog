@@ -1,0 +1,131 @@
+---
+title: Sustainability Word Cloud with Tidytext [R]
+author: ''
+date: '2020-02-29'
+slug: sustainability-word-cloud-with-tidytext
+categories: []
+tags: []
+---
+```{r include=FALSE}
+library(tidyverse)
+library(tidytext)
+library(readxl)
+library(janitor)
+library(wordcloud)
+library(SemNetCleaner) #for singularize
+```
+
+For the past year, I have worked at Harvard's Office for Sustainability as an Undergraduate Sustainability REP. The other day, my team hosted a fun event called "Cookies for Questions". Freshmen students were invited to text in a question about sustainability at Harvard. In return, one of us REPs would hand deliver them a piping hot cookie fresh out of the oven, and give them an answer to their question. 
+
+All in all, the event was a success. Over 130 students texted us a question and the REPs enjoyed engaging with the students. Luckily, we used an excel spreadsheet to record the information for each delivery: where they were located, what question they asked, and obviously what type of cookie they wanted delivered. 
+
+Using a cleaned dataset (minus all identifiable data), I will do some data analysis and create a sustainabilty wordcloud, that will hopefully provide us some useful insights. 
+
+To clean the initial data, I used the packages readxl and janitor. The function janitor::clean_names() is so so so useful. 
+
+
+```{r include=FALSE}
+questions = read_excel("questions/questions.xlsx")
+
+
+questions = clean_names(questions)
+
+questions = questions %>% 
+  rename("dorm" = dorm_room, "question" = what_question_s_do_you_have_about_sustainability_at_harvard, "cookie" = what_kind_of_cookie_would_you_like_to_order)
+
+questions = questions[1:135,]
+
+questions = questions %>% 
+  separate(dorm, into = c("dorm", "room"), sep = " ")
+
+questions = questions %>% 
+  mutate(cookie = replace(cookie, !cookie %in% c("Chocolate chip", "Snickerdoodle"), "vegan or gf")) %>% 
+  mutate(cookie = as.factor(tolower(cookie)))
+  
+questions = questions %>% 
+  mutate(dorm = str_to_sentence(dorm)) %>% 
+  mutate(dorm=replace(dorm, dorm %in% c("Wigg", "Wiggle"), "Wigglesworth")) %>%
+  mutate(dorm = replace(dorm, dorm == "Gray's", "Grays")) %>% 
+  mutate(dorm = replace(dorm, dorm %in% c("Mathews","512"), "Matthews")) %>% 
+  mutate(dorm = as.factor(dorm))
+
+```
+
+
+
+First up is cookies. The most popular cookie by far was chocolate chip, and there were very few orders of vegan or gluten free. 
+
+```{r echo=FALSE}
+questions %>% 
+  group_by(cookie) %>% 
+  count() %>% 
+  ggplot(aes(fct_reorder(cookie, n), n))+
+  geom_col(fill = "#bfa290") +
+  coord_flip() +
+  labs( 
+    x = "Cookie", 
+    y = "Number", 
+    title = "Types of Cookies Delivered"
+    ) +
+  theme(plot.background = element_rect(fill = "#FFFDD0"),
+        panel.background = element_rect(fill = "#FFFDD0",
+                                colour = "#FFFDD0"
+                                ),
+        panel.border = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+
+```
+
+Next, I looked at dorms. Even Lamont Library and Pierce (the engineering building) managed to get a few cookies delivered to them. 
+
+```{r echo=FALSE}
+ questions %>% 
+  filter(dorm != "In") %>% 
+  group_by(dorm) %>% 
+  count() %>% 
+  ggplot(aes(fct_reorder(dorm, n), n))+
+  geom_col(fill = "#bfa290") +
+  coord_flip() +
+  labs( 
+    x = "Dorm", 
+    y = "Number", 
+    title = "Deliveries by Dorm"
+    ) +
+  theme(plot.background = element_rect(fill = "#FFFDD0"),
+        panel.background = element_rect(fill = "#FFFDD0",
+                                colour = "#FFFDD0"
+                                ),
+        panel.border = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())
+
+```
+
+
+
+Finally, I created the word cloud. First, I call the unnest_tokens function from the tidytext package, this takes each word of each question and puts that word in its own row. Then, I complete an anti join with a data set of "stop words" (words like a, the, and, etc..) that are just noise for our purposes. After that use map_chr() and SemNetCleaner:: singularize to convert each word to its singular form. If I didn't do that cup and cups would be counted separately. 
+
+
+Then, grouping and couting each word, I call wordcloud() to display the top 50 most used words submitted in questions for cookies. I could have removed Harvard from the list, but it made sense to keep it in! 
+
+```{r }
+data(stop_words)
+
+tidy_questions = questions %>% 
+  select(question) %>% 
+  unnest_tokens(word, question) 
+
+tidy_questions = tidy_questions %>% 
+  anti_join(stop_words, by = "word")
+
+tidy_questions$word = map_chr(tidy_questions$word, ~ singularize(.))
+
+pal <- brewer.pal(8,"Dark2")
+
+# plot the 50 most common words
+tidy_questions %>% 
+  count(word) %>% 
+  arrange(desc(n)) %>% 
+  with(wordcloud(word, n, random.order = FALSE, max.words = 50, colors=pal))
+```
